@@ -1,0 +1,10 @@
+char *istrdup(const char *s);
+struct goods *lookup(char *id);
+struct goods *addgoods(void);
+struct goods *install(struct goods *p);
+void modifygoods(struct goods *p);
+int showgoods(int (*func)(struct goods *));
+int delgoods(char *id);
+int checkinventory(struct goods *p);
+int checkprice(struct goods *p);
+void printinfo(struct goods *p);
