@@ -120,6 +120,8 @@ void checkout(struct cart *item){
 	int i=0;
 	double sum=0;
 	double profits=0;
+	double one_piece_sum=0;
+	double one_piece_profits=0;
 	struct goods *p;
 	
 	for(i=0;i < wdlimit;i++){
@@ -134,14 +136,16 @@ void checkout(struct cart *item){
 	for(i=0;i < wdlimit;i++){
 		if(item[i].id!=NULL){
 			p=lookup(item[i].id);
-			sum = p->price *item[i].amount;
-			profits = (p->price - p->cost) * item[i].amount;
+			one_piece_sum = p->price *item[i].amount;
+			one_piece_profits = (p->price - p->cost) * item[i].amount;
 			p->amount -= item[i].amount;
 			item[i].amount=0;//set to zero
 			free((void *)item[i].id);
 		}
+		sum += one_piece_sum;
+		profits += one_piece_profits;
 	}
-	puts("\n\n\n");
+	puts("\n\n\n");	
 	printf("the Total price is %f,the profits is %f.\n",sum,profits);
 	backup();
 }
