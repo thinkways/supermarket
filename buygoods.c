@@ -2,13 +2,23 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "buygoods.h"
 #include "textmgr.h"
 #include "market.h"
 #include "datamgr.h"
 #include "filemgr.h"
-#include "buy.h"
 
-struct cart item[wdlimit];
+
+struct cart item[wdlimit]={0};
+
+int item_exist_num(struct cart *p){
+	int i=0;
+	int ret=0;
+	for(;i<wdlimit;i++)
+		if(item[i].id != NULL)
+			ret++;
+	return ret;
+}
 
 int lookup_item(char *id){
 	int i=0;
@@ -29,20 +39,31 @@ int Added_quantity(char *id){
 		return item[i].amount;
 }
 
-int buygoods(void){
+void set_cart_empty(struct cart *p){
+	int i=0;
+	for(;i<wdlimit;i++){
+		if(item[i].id!=NULL){
+			free((void *)item[i].id);
+		}
+		item[i].amount=0;//set to zero
+	}
+}
+
+void buygoods(void){
+	int i=0;
 	char buff[wdlimit];
 	int flag=1;
+	int getitem=0;
 	int go_on=1;
-	int i=0;
 	int option=1;
-	int id_num=0;
 	int exist_num=0;
 	int amount=0;
 	int not_enough=0;
 	struct goods *p;
 
+	i=item_exist_num(item);
 	while(go_on){
-		id_num=i;
+		flag=1;
 		while(flag){
 			puts("\nplease input item id,press q/Q to exit");
 			fflush(stdin);
@@ -55,6 +76,10 @@ int buygoods(void){
 				puts("not a number,try again");
 			}
 
+			//check go_on,if 0 then no need to continue
+			if(go_on==0)
+				break;
+
 			p=lookup(buff);
 			if(go_on&&(p==NULL))
 				puts("item not found,try again");
@@ -64,17 +89,17 @@ int buygoods(void){
 			else if(go_on){
 				//store id
 				if(-1==lookup_item(buff)){//²»´æÔÚ´Ëid
+					i=item_exist_num(item);
 					item[i].id=istrdup(buff);
 					flag=0;
 				}
 				else{
-					id_num=lookup_item(buff);
+					i=lookup_item(buff);
 					flag=0;
 				}	
 			}
 		}
 
-		//check go_on,if 0 then no need to continue
 		if(go_on==0)
 			break;
 		//get amount 
@@ -85,22 +110,20 @@ int buygoods(void){
 			while(!isdigit(igetword(stdin,buff)))
 				puts("not a number,try again");
 			amount=atoi(buff);
-			p=lookup(item[id_num].id);
+			p=lookup(item[i].id);
 			not_enough=(p->amount < amount+exist_num);
 			if(!not_enough)
-				item[id_num].amount=amount+exist_num;
+				item[i].amount=amount+exist_num;
 			else{
 				printf("\nyou want too much, only %d remaining. ",p->amount);				
 				puts("try again");
 			}
 		} while (not_enough);
 
-		flag=1;
-		if(id_num==i)
-			i++;	
+		getitem=1;	
 	}
 
-	while(!flag){
+	while(getitem){
 		puts("\npress c/C to check out,press b/B to buy something");
 		fflush(stdin);
 		option=getchar();
@@ -113,7 +136,6 @@ int buygoods(void){
 			break;
 		}
 	}
-	return i;
 }
 
 void checkout(struct cart *item){
@@ -139,12 +161,16 @@ void checkout(struct cart *item){
 			one_piece_sum = p->price *item[i].amount;
 			one_piece_profits = (p->price - p->cost) * item[i].amount;
 			p->amount -= item[i].amount;
-			item[i].amount=0;//set to zero
-			free((void *)item[i].id);
+		}
+		else{
+			one_piece_sum=0;
+			one_piece_profits=0;
 		}
 		sum += one_piece_sum;
 		profits += one_piece_profits;
 	}
+	sum += one_piece_sum;
+	profits += one_piece_profits;
 	puts("\n\n\n");	
 	printf("the Total price is %f,the profits is %f.\n",sum,profits);
 	backup();

@@ -59,6 +59,8 @@ struct goods *install(struct goods *p){
 }
 
 void printinfo(struct goods *p){
+	if(p==NULL)
+		return;
 	//printf("%s#%s#%s#%fl#%fl#%d\n",p->id,p->name,p->category,p->cost,p->price,p->amount);
 	printf("编号 %-8s品名 %-8s类别 %-8s进价 %-8.3f售价 %-8.3f库存 %-8d\n",p->id,\
 		p->name,p->category,p->cost,p->price,p->amount);
@@ -72,7 +74,7 @@ int checkprice(struct goods *p){
 		error = 1;
 	while(error){
 		printf("the item: %s went wrong",p->id);
-		puts("\nyour cost price is bigger than sold price,now modify");
+		puts("\n\nyour cost price is bigger than sold price,now modify");
 		puts("Please input the cost price");
 		while(!isdigit(igetword(stdin,tmp)))
 			puts("not a number! try again");

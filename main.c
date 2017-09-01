@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <ctype.h>
+#include "buygoods.h"
 #include "market.h"
 #include "datamgr.h"
-#include "buy.h"
 #include "filemgr.h"
 #include "textmgr.h"
 
+extern struct cart item[wdlimit];
 int goback(void){
 	int i;
 
@@ -62,19 +63,22 @@ int main(void){
 			back=goback();
 			break;
 		case '2':
-			if(!showgoods((int (*)(struct goods *))0))
+			if(!showgoods((int (*)(struct goods *))0)){
 				puts("stock is empty.");
+			}
 			back=goback();
 			break;
 		case '3':
 			showgoods((int (*)(struct goods *))0);
 			buygoods();
+			set_cart_empty(item);
 			back=goback();
 			break;
 		case '4':
 			puts("please input id");
-			while(!isdigit(igetword(stdin,id)))
+			while(!isdigit(igetword(stdin,id))){
 				puts("not a number! try again");
+			}
 			p=lookup(id);
 			if(p==NULL)
 				puts("not found");
@@ -82,17 +86,17 @@ int main(void){
 				modifygoods(p);
 				printinfo(p);
 			}
-			
 			back=goback();
 			break;
 		case '5':
 			puts("please input id");
-			while(!isdigit(igetword(stdin,id)))
+			while(!isdigit(igetword(stdin,id))){
 				puts("not a number! try again");
+			}
+			p=lookup(id);
 			if(p==NULL)
 				puts("not found");
 			else{
-				p=lookup(id);
 				printinfo(p);
 			}
 			
@@ -100,8 +104,10 @@ int main(void){
 			break;
 		case '6':
 			puts("please input id");
-			while(!isdigit(igetword(stdin,id)))
+			while(!isdigit(igetword(stdin,id))){
 				puts("not a number! try again");
+			}
+			p=lookup(id);
 			if(p==NULL)
 				puts("not found");
 			else{
